@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-07-02)
  * @module highcharts/highcharts
  *
  * (c) 2009-2018 Torstein Honsi

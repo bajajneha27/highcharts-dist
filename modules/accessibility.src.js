@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-07-02)
  *
  * Accessibility module
  *
@@ -2669,7 +2669,7 @@
 
         return SeriesKeyboardNavigation;
     });
-    _registerModule(_modules, 'modules/accessibility/components/AnnotationsA11y.js', [_modules['parts/Utilities.js'], _modules['modules/accessibility/utils/htmlUtilities.js']], function (U, HTMLUtilities) {
+    _registerModule(_modules, 'modules/accessibility/components/AnnotationsA11y.js', [_modules['modules/accessibility/utils/htmlUtilities.js']], function (HTMLUtilities) {
         /* *
          *
          *  (c) 2009-2019 Øystein Moseng
@@ -2681,7 +2681,6 @@
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var inArray = U.inArray;
         var escapeStringForHTML = HTMLUtilities.escapeStringForHTML,
             stripHTMLTagsFromString = HTMLUtilities.stripHTMLTagsFromString;
         /**
@@ -2796,8 +2795,7 @@
         function getPointAnnotationTexts(point) {
             var labels = getChartAnnotationLabels(point.series.chart);
             var pointLabels = labels
-                    .filter(function (label) { return inArray(point,
-                label.points) > -1; });
+                    .filter(function (label) { return label.points.indexOf(point) > -1; });
             if (!pointLabels.length) {
                 return [];
             }

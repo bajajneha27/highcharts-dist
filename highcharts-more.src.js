@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-07-02)
  *
  * (c) 2009-2018 Torstein Honsi
  *
@@ -386,7 +386,7 @@
          * @return {boolean}
          */
         function isInsidePane(x, y, center) {
-            return Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) < center[2] / 2;
+            return Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) <= center[2] / 2;
         }
         H.Chart.prototype.getHoverPane = function (eventArgs) {
             var chart = this;
@@ -3349,8 +3349,8 @@
              */
             lineWidth: 1,
             /**
-             * The color of the median line. If `undefined`, the general series color
-             * applies.
+             * The color of the median line. If `undefined`, the general series
+             * color applies.
              *
              * In styled mode, the median stroke width can be set with the
              * `.highcharts-boxplot-median` class.
@@ -3529,7 +3529,9 @@
              * @product highcharts
              */
             whiskerWidth: 2
-        }, /** @lends Highcharts.seriesTypes.boxplot */ {
+        }, 
+        /** @lends Highcharts.seriesTypes.boxplot */
+        {
             // array point configs are mapped to this
             pointArrayMap: ['low', 'q1', 'median', 'q3', 'high'],
             // return a plain array for speedy calculation

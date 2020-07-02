@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-07-02)
  *
  * Annotations module
  *
@@ -36,7 +36,6 @@
          * */
         var addEvent = U.addEvent,
             fireEvent = U.fireEvent,
-            inArray = U.inArray,
             objectEach = U.objectEach,
             pick = U.pick,
             removeEvent = U.removeEvent;
@@ -80,7 +79,7 @@
                         emitter.target);
                         }
                     };
-                    if (inArray(type, emitter.nonDOMEvents || []) === -1) {
+                    if ((emitter.nonDOMEvents || []).indexOf(type) === -1) {
                         emitter.graphic.on(type, eventHandler);
                     }
                     else {
@@ -3936,6 +3935,7 @@
                 function traverse(option, key, parentEditables, parent) {
                     var nextParent;
                     if (parentEditables &&
+                        option &&
                         nonEditables.indexOf(key) === -1 &&
                         ((parentEditables.indexOf &&
                             parentEditables.indexOf(key)) >= 0 ||
@@ -4136,7 +4136,7 @@
                 rect: ['shapes'],
                 // Crooked lines, elliots, arrows etc:
                 crookedLine: [],
-                basicAnnotation: []
+                basicAnnotation: ['shapes', 'labelOptions']
             };
             // Define non editable fields per annotation, for example Rectangle inherits
             // options from Measure, but crosshairs are not available

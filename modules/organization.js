@@ -1,5 +1,5 @@
 /*
- Highcharts JS v8.1.2 (2020-06-16)
+ Highcharts JS v8.1.2 (2020-07-02)
  Organization chart series type
 
  (c) 2019-2019 Torstein Honsi

@@ -28,7 +28,7 @@ import Color from './Color.js';
 var color = Color.parse;
 import LegendSymbolMixin from '../mixins/legend-symbol.js';
 import U from './Utilities.js';
-var animObject = U.animObject, clamp = U.clamp, defined = U.defined, extend = U.extend, isNumber = U.isNumber, merge = U.merge, pick = U.pick, seriesType = U.seriesType;
+var animObject = U.animObject, clamp = U.clamp, defined = U.defined, extend = U.extend, isNumber = U.isNumber, merge = U.merge, pick = U.pick, seriesType = U.seriesType, objectEach = U.objectEach;
 import './Series.js';
 import './Options.js';
 var noop = H.noop, Series = H.Series, svg = H.svg;
@@ -344,22 +344,6 @@ seriesType('column', 'line',
          */
         y: void 0
     },
-    /**
-     * When this is true, the series will not cause the Y axis to cross
-     * the zero plane (or [threshold](#plotOptions.series.threshold) option)
-     * unless the data actually crosses the plane.
-     *
-     * For example, if `softThreshold` is `false`, a series of 0, 1, 2,
-     * 3 will make the Y axis show negative values according to the
-     * `minPadding` option. If `softThreshold` is `true`, the Y axis starts
-     * at 0.
-     *
-     * @since   4.1.9
-     * @product highcharts highstock
-     *
-     * @private
-     */
-    softThreshold: false,
     // false doesn't work well: https://jsfiddle.net/highcharts/hz8fopan/14/
     /**
      * @ignore-option
@@ -584,7 +568,7 @@ seriesType('column', 'line',
             // enabled, but `centerInCategory` is true, there is one stack
             // handling the grouping of points in each category. This is
             // done in the `setGroupedPoints` function.
-            Highcharts.objectEach(this.yAxis.stacking && this.yAxis.stacking.stacks, function (stack) {
+            objectEach(this.yAxis.stacking && this.yAxis.stacking.stacks, function (stack) {
                 if (typeof point.x === 'number') {
                     var stackItem = stack[point.x.toString()];
                     if (stackItem) {

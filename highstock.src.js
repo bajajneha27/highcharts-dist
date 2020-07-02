@@ -1,5 +1,5 @@
 /**
- * @license Highstock JS v8.1.2 (2020-06-16)
+ * @license Highstock JS v8.1.2 (2020-07-02)
  *
  * (c) 2009-2018 Torstein Honsi
  *
@@ -3327,7 +3327,6 @@
             erase = U.erase,
             extend = U.extend,
             fireEvent = U.fireEvent,
-            inArray = U.inArray,
             isArray = U.isArray,
             isFunction = U.isFunction,
             isNumber = U.isNumber,
@@ -6202,7 +6201,7 @@
          * Array of path commands, that will go into the `d` attribute of an SVG
          * element.
          *
-         * @typedef {Array<Array<Highcharts.SVGPathCommand,number?,number?,number?,number?,number?,number?,number?>>} Highcharts.SVGPathArray
+         * @typedef {Array<(Array<Highcharts.SVGPathCommand>|Array<Highcharts.SVGPathCommand,number>|Array<Highcharts.SVGPathCommand,number,number>|Array<Highcharts.SVGPathCommand,number,number,number,number>|Array<Highcharts.SVGPathCommand,number,number,number,number,number,number>|Array<Highcharts.SVGPathCommand,number,number,number,number,number,number,number>)>} Highcharts.SVGPathArray
          */
         /**
          * Possible path commands in an SVG path array. Valid values are `A`, `C`, `H`,
@@ -15511,7 +15510,7 @@
                 }
                 else {
                     // Adjust to hard threshold
-                    if (!softThreshold && defined(threshold)) {
+                    if (softThreshold && defined(threshold)) {
                         if (axis.dataMin >= threshold) {
                             thresholdMin = threshold;
                             minPadding = 0;
@@ -37853,20 +37852,6 @@
              * @apioption plotOptions.area.trackByArea
              */
             /**
-             * When this is true, the series will not cause the Y axis to cross
-             * the zero plane (or [threshold](#plotOptions.series.threshold) option)
-             * unless the data actually crosses the plane.
-             *
-             * For example, if `softThreshold` is `false`, a series of 0, 1, 2,
-             * 3 will make the Y axis show negative values according to the
-             * `minPadding` option. If `softThreshold` is `true`, the Y axis starts
-             * at 0.
-             *
-             * @since   4.1.9
-             * @product highcharts highstock
-             */
-            softThreshold: false,
-            /**
              * The Y axis value to serve as the base for the area, for
              * distinguishing between values above and below a threshold. The area
              * between the graph and the threshold is filled.
@@ -38665,7 +38650,8 @@
             isNumber = U.isNumber,
             merge = U.merge,
             pick = U.pick,
-            seriesType = U.seriesType;
+            seriesType = U.seriesType,
+            objectEach = U.objectEach;
         var noop = H.noop,
             Series = H.Series,
             svg = H.svg;
@@ -38981,22 +38967,6 @@
                  */
                 y: void 0
             },
-            /**
-             * When this is true, the series will not cause the Y axis to cross
-             * the zero plane (or [threshold](#plotOptions.series.threshold) option)
-             * unless the data actually crosses the plane.
-             *
-             * For example, if `softThreshold` is `false`, a series of 0, 1, 2,
-             * 3 will make the Y axis show negative values according to the
-             * `minPadding` option. If `softThreshold` is `true`, the Y axis starts
-             * at 0.
-             *
-             * @since   4.1.9
-             * @product highcharts highstock
-             *
-             * @private
-             */
-            softThreshold: false,
             // false doesn't work well: https://jsfiddle.net/highcharts/hz8fopan/14/
             /**
              * @ignore-option
@@ -39245,7 +39215,7 @@
                     // enabled, but `centerInCategory` is true, there is one stack
                     // handling the grouping of points in each category. This is
                     // done in the `setGroupedPoints` function.
-                    Highcharts.objectEach(this.yAxis.stacking && this.yAxis.stacking.stacks, function (stack) {
+                    objectEach(this.yAxis.stacking && this.yAxis.stacking.stacks, function (stack) {
                         if (typeof point.x === 'number') {
                             var stackItem = stack[point.x.toString()];
                             if (stackItem) {
@@ -40258,7 +40228,7 @@
         };
 
     });
-    _registerModule(_modules, 'parts/PieSeries.js', [_modules['parts/Globals.js'], _modules['mixins/legend-symbol.js'], _modules['parts/Point.js'], _modules['parts/Utilities.js']], function (H, LegendSymbolMixin, Point, U) {
+    _registerModule(_modules, 'parts/PieSeries.js', [_modules['parts/Globals.js'], _modules['parts/SVGRenderer.js'], _modules['mixins/legend-symbol.js'], _modules['parts/Point.js'], _modules['parts/Utilities.js']], function (H, SVGRenderer, LegendSymbolMixin, Point, U) {
         /* *
          *
          *  (c) 2010-2020 Torstein Honsi
@@ -41084,7 +41054,7 @@
                             .add(this.group);
                     }
                     this.graph.attr({
-                        d: Highcharts.SVGRenderer.prototype.symbols.arc(centerX, centerY, this.center[2] / 2, 0, {
+                        d: SVGRenderer.prototype.symbols.arc(centerX, centerY, this.center[2] / 2, 0, {
                             start: start,
                             end: end,
                             innerR: this.center[3] / 2
@@ -43039,7 +43009,6 @@
                                     label.css({ pointerEvents: newOpacity ? 'auto' : 'none' });
                                 }
                                 label.visibility = newOpacity ? 'inherit' : 'hidden';
-                                label.placed = !!newOpacity;
                             };
                             isLabelAffected = true;
                             // Animate or set the opacity
@@ -52244,6 +52213,8 @@
                 /**
                  * A custom callback function to parse values entered in the input boxes
                  * and return a valid JavaScript time as milliseconds since 1970.
+                 * The first argument passed is a value to parse,
+                 * second is a boolean indicating use of the UTC time.
                  *
                  * @sample {highstock} stock/rangeselector/input-format/
                  *         Milliseconds in the range selector
@@ -52819,6 +52790,20 @@
                 this.setInputValue(name);
             };
             /**
+             * @private
+             * @function Highcharts.RangeSelector#defaultInputDateParser
+             */
+            RangeSelector.prototype.defaultInputDateParser = function (inputDate, useUTC) {
+                var date = new Date();
+                if (H.isSafari) {
+                    return Date.parse(inputDate.split(' ').join('T'));
+                }
+                if (useUTC) {
+                    return Date.parse(inputDate + 'Z');
+                }
+                return Date.parse(inputDate) - date.getTimezoneOffset() * 60 * 1000;
+            };
+            /**
              * Draw either the 'from' or the 'to' HTML input box of the range selector
              *
              * @private
@@ -52838,19 +52823,21 @@
                     input,
                     label,
                     dateBox,
-                    inputGroup = this.inputGroup;
+                    inputGroup = this.inputGroup,
+                    defaultInputDateParser = this.defaultInputDateParser;
                 /**
                  * @private
                  */
                 function updateExtremes() {
                     var inputValue = input.value,
-                        value = (options.inputDateParser || Date.parse)(inputValue),
+                        value,
                         chartAxis = chart.xAxis[0],
                         dataAxis = chart.scroller && chart.scroller.xAxis ?
                             chart.scroller.xAxis :
                             chartAxis,
                         dataMin = dataAxis.dataMin,
                         dataMax = dataAxis.dataMax;
+                    value = (options.inputDateParser || defaultInputDateParser)(inputValue, chart.time.useUTC);
                     if (value !== input.previousValue) {
                         input.previousValue = value;
                         // If the value isn't parsed directly to a value by the
